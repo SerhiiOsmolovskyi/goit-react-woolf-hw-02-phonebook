@@ -10,49 +10,29 @@ export class ContactForm extends Component {
     number: '',
   };
 
-  handleNameChange = (event) => {
+  handleChange = (event) => {
+    const { name, value } = event.target;
     this.setState({
-      ...this.state,
-      name: event.target.value,
-    });
-  };
-
-  handleNumberChange = (event) => {
-    this.setState({
-      ...this.state,
-      number: event.target.value,
+      [name]: value,
     });
   };
 
   handleAddContact = () => {
-    const { addContact, contacts } = this.props;
+    const { addContact } = this.props;
+    const { name, number } = this.state;
 
-    if (this.state.name.trim() === '' || this.state.number.trim() === '') {
+    if (name.trim() === '' || number.trim() === '') {
       alert('Please enter both name and phone number.');
       return;
     }
 
-    const phoneNumber = parsePhoneNumberFromString(this.state.number, 'ZZ');
+    const phoneNumber = parsePhoneNumberFromString(number, 'ZZ');
     if (!phoneNumber || !phoneNumber.isValid()) {
       alert('Please enter a valid phone number. The expected format is +1234567890.');
       return;
     }
 
-    if (contacts.some((contact) => contact.name.toLowerCase() === this.state.name.toLowerCase())) {
-      alert('Contact with this name already exists. Please enter a different name.');
-      return;
-    }
-
-    const newContact = {
-      id: nanoid(),
-      name: this.state.name,
-      number: this.state.number,
-    };
-
-    console.log('New contact to add:', newContact);
-
-    addContact(newContact);
-
+    addContact({ id: nanoid(), name, number });
     this.setState({
       name: '',
       number: '',
@@ -69,7 +49,7 @@ export class ContactForm extends Component {
           title="Please enter a valid name"
           required
           value={this.state.name}
-          onChange={this.handleNameChange}
+          onChange={this.handleChange}
           placeholder="Enter name"
           className={css.input}
         />
@@ -80,7 +60,7 @@ export class ContactForm extends Component {
           title="Please enter a valid phone number. The expected format is +1234567890."
           required
           value={this.state.number}
-          onChange={this.handleNumberChange}
+          onChange={this.handleChange}
           placeholder="Enter phone number"
           className={css.input}
         />
